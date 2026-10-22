@@ -11,6 +11,8 @@ var FLAG = '🚩'
 var gSecondsInterval
 
 function onInit() {
+    console.log('onInit()')
+
     // size of the board and number of mines
     gLevel = {
         SIZE: 10,
@@ -36,6 +38,7 @@ function onInit() {
 }
 
 function restartGame() {
+    console.log('restartGame()')
 
     // stop the seconds counter
     clearInterval(gSecondsInterval)
@@ -63,6 +66,8 @@ function restartGame() {
 }
 
 function buildBoard() {
+    console.log('buildBoard()')
+
     var board = []
 
     // build empty board
@@ -132,6 +137,8 @@ function countMinesAround(row, col) {
 }
 
 function renderBoard() {
+    console.log('renderBoard()')
+
     // create the table to insert in the html inside .main-board
     var htmlStr = '<table>'
     for (var i = 0; i < gLevel.SIZE; i++) {
@@ -158,11 +165,12 @@ function renderBoard() {
                 }
             }
 
+            // the class revealed gives a lighter background color to a cell that was revealed
             var revealed = cell.isRevealed ? 'revealed' : ''
 
-            var part1 = `class="cell cell-${i}-${j} ${revealed}"`
-            var part2 = `onclick="onCellClicked(this,${i},${j})"`
-            var part3 = `oncontextmenu="onCellMarked(this,${i},${j})"`
+            var part1 = `class="cell cell-${i}-${j} ${revealed}"`       // for instance cell cell-0-1
+            var part2 = `onclick="onCellClicked(this,${i},${j})"`       // on click for a normal click on a cell
+            var part3 = `oncontextmenu="onCellMarked(this,${i},${j})"`  // on context menu for a right click on a cell to mark it with a flag
             var line = `<td ${part1} ${part2} ${part3}>${content}</td>`
 
             htmlStr += line
@@ -184,6 +192,8 @@ function incrementSeconds() {
 }
 
 function onCellClicked(elCell, row, col) {
+    console.log(`onCellClicked(this, ${row}, ${col})`)
+
     if (gGame.isGameOver) {
         console.log('Game is already over')
         return
@@ -234,29 +244,34 @@ function onCellClicked(elCell, row, col) {
     }
 }
 
+// Reveal neighbor cells after clicking an empty cell, a recursive function
 function revealNeighbors(row, col) {
+    console.log(`revealNeighbors(${row}, ${col})`)
+
     for (var i = row - 1; i <= row + 1; i++) {
-        if (i < 0 || i > gLevel.SIZE - 1) continue
+        if (i < 0 || i > gLevel.SIZE - 1) continue // check only valid rows
 
         for (var j = col - 1; j <= col + 1; j++) {
-            if (j < 0 || j > gLevel.SIZE - 1) continue
-            if (i === row && j === col) continue
+            if (j < 0 || j > gLevel.SIZE - 1) continue // check only valid columns
+            if (i === row && j === col) continue // ignore the center cell
 
             var cell = gBoard[i][j]
 
-            if (cell.isRevealed) continue
+            if (cell.isRevealed) continue // no need to check again if the cell is already revealed
 
+            // update the model
             cell.isRevealed = true
             gGame.revealedCount++
 
             var content
             if (cell.minesAroundCount === 0) {
                 content = EMPTY
-                revealNeighbors(i, j)
+                revealNeighbors(i, j) // recursive call
             } else {
                 content = cell.minesAroundCount
             }
 
+            // update the DOM
             var element = document.querySelector(`.cell-${i}-${j}`)
             element.innerText = content
             element.classList.add('revealed')
@@ -265,7 +280,9 @@ function revealNeighbors(row, col) {
 }
 
 function checkForWin() {
-    // check if there's a winning
+    console.log('checkForWin()')
+
+    // check for a win
     var totalCells = gLevel.SIZE * gLevel.SIZE
     var leftCells = totalCells - gGame.revealedCount
 
@@ -282,7 +299,10 @@ function checkForWin() {
     }
 }
 
+// Reveal entire board, when the game is over, when the player won or lost
 function revealEntireBoard() {
+    console.log('revealEntireBoard()')
+
     for (var i = 0; i < gLevel.SIZE; i++) {
         for (var j = 0; j < gLevel.SIZE; j++) {
             var cell = gBoard[i][j]
@@ -306,14 +326,16 @@ function revealEntireBoard() {
     }
 }
 
+// Get a random number, both the maximum and the minimum are inclusive
 function getRandomNumber(min, max) {
-    // The maximum is inclusive and the minimum is inclusive
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
     return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled);
 }
 
+// Mark a cell with a flag by right clicking on a cell
 function onCellMarked(elCell, row, col) {
+    console.log(`onCellMarked(this, ${row}, ${col})`)
 
     if (gGame.isGameOver) {
         console.log('Game is already over')
