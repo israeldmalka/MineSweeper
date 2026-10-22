@@ -38,6 +38,8 @@ function restartGame() {
     gLevel = null
     gSecondsInterval = null
     document.querySelector('.main-board table').remove()
+    var element = document.querySelector('.main-smile img')
+    element.setAttribute('src', 'img/happy.png')
     onInit()
 }
 
