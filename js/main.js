@@ -202,6 +202,7 @@ function onCellClicked(elCell, row, col) {
         var content
         if (cell.minesAroundCount === 0) {
             content = EMPTY
+            console.log('Revealing neighbors around empty cell recursively')
             revealNeighbors(row, col)
         } else {
             content = cell.minesAroundCount
