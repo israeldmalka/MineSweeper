@@ -11,8 +11,6 @@ var FLAG = '🚩'
 var gSecondsInterval
 
 function onInit() {
-    console.log('onInit()')
-
     gLevel = {
         SIZE: 10,
         MINES: 10
@@ -26,7 +24,6 @@ function onInit() {
         secondsPassed: 0
     }
 
-    // show the number of mines in the title
     var element = document.querySelector('.mines-counter .number')
     element.innerText = gLevel.MINES
 
@@ -34,9 +31,17 @@ function onInit() {
     renderBoard()
 }
 
-function buildBoard() {
-    console.log('buildBoard()')
+function restartGame() {
+    clearInterval(gSecondsInterval)
+    gGame = null
+    gBoard = null
+    gLevel = null
+    gSecondsInterval = null
+    document.querySelector('.main-board table').remove()
+    onInit()
+}
 
+function buildBoard() {
     var board = []
 
     // build empty board
@@ -76,8 +81,6 @@ function buildBoard() {
 
 // Count mines around each cell and set the cell's minesAroundCount.
 function setMinesNegsCount() {
-    console.log('setMinesNegsCount()')
-
     for (var i = 0; i < gLevel.SIZE; i++) {
         for (var j = 0; j < gLevel.SIZE; j++) {
             var count = countMinesAround(i, j)
@@ -88,8 +91,6 @@ function setMinesNegsCount() {
 }
 
 function countMinesAround(row, col) {
-    console.log(`countMinesAround(${row}, ${col})`)
-
     var count = 0
     for (var i = row - 1; i <= row + 1; i++) {
         if (i < 0 || i > gLevel.SIZE - 1) continue
@@ -109,8 +110,6 @@ function countMinesAround(row, col) {
 }
 
 function renderBoard() {
-    console.log('renderBoard()')
-
     var htmlStr = '<table>'
 
     for (var i = 0; i < gLevel.SIZE; i++) {
@@ -163,8 +162,6 @@ function incrementSeconds() {
 }
 
 function onCellClicked(elCell, row, col) {
-    console.log(`onCellClicked ${row} ${col}`)
-
     if (gGame.isGameOver) {
         console.log('Game is already over')
         return
@@ -215,8 +212,6 @@ function onCellClicked(elCell, row, col) {
 }
 
 function revealNeighbors(row, col) {
-    console.log(`revealNeighbors(${row}, ${col})`)
-
     for (var i = row - 1; i <= row + 1; i++) {
         if (i < 0 || i > gLevel.SIZE - 1) continue
 
@@ -289,15 +284,13 @@ function revealEntireBoard() {
 }
 
 function getRandomNumber(min, max) {
+    // The maximum is inclusive and the minimum is inclusive
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
     return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled);
-    // The maximum is inclusive and the minimum is inclusive
 }
 
 function onCellMarked(elCell, row, col) {
-    console.log('elCell: ', elCell)
-
     var cell = gBoard[row][col]
 
     if (cell.isRevealed) {
@@ -307,47 +300,14 @@ function onCellMarked(elCell, row, col) {
 
     if (cell.isMarked) {
         // the cell is already marked, so unmark it
-
-        console.log(`unmarking cell ${row} ${col}`)
-
         cell.isMarked = false
         gGame.markedCount--
         elCell.innerText = EMPTY
 
     } else {
         // the cell is not marked, so mark it
-
-        console.log(`marking cell ${row} ${col}`)
-
         cell.isMarked = true
         gGame.markedCount++
         elCell.innerText = FLAG
     }
 }
-
-
-// // another option to check for the game status :
-//
-// function checkGameOver() {
-//     for (var i = 0; i < gLevel.SIZE; i++) {
-//         for (var j = 0; j < gLevel.SIZE; j++) {
-//             var cell = gBoard[i][j]
-
-//             if (!cell.isMine && !cell.isRevealed) {
-//                 // we have an empty cell that is not revealed
-//                 console.log('There are still unrevealed empty cells')
-//                 return false
-//             }
-
-//             if (cell.isMine && cell.isRevealed) {
-//                 // we have a mine that was revealed, so Game Over
-//                 console.log('You have stepped on a mine. Game Over!')
-//                 return true
-//             }
-//         }
-//     }
-
-//     // we have a winning
-//     console.log('You won the game!')
-//     return true
-// } 
