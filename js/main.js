@@ -11,11 +11,13 @@ var FLAG = '🚩'
 var gSecondsInterval
 
 function onInit() {
+    // size of the board and number of mines
     gLevel = {
         SIZE: 10,
         MINES: 10
     }
 
+    // initial state of the game
     gGame = {
         isStarted: false,
         isGameOver: false,
@@ -24,22 +26,39 @@ function onInit() {
         secondsPassed: 0
     }
 
+    // show the number of mines
     var element = document.querySelector('.mines-counter .number')
     element.innerText = gLevel.MINES
 
+    // create the board and render it on the page
     buildBoard()
     renderBoard()
 }
 
 function restartGame() {
+
+    // stop the seconds counter
     clearInterval(gSecondsInterval)
+
+    // reset the game state
     gGame = null
     gBoard = null
     gLevel = null
     gSecondsInterval = null
+
+    // remove the table
     document.querySelector('.main-board table').remove()
     var element = document.querySelector('.main-smile img')
+
+    // reset the smiley image
     element.setAttribute('src', 'img/happy.png')
+
+    // show zero seconds
+    element = document.querySelector('.main-counter .seconds')
+    element.innerText = '0'
+
+
+    // restart the game
     onInit()
 }
 
@@ -92,14 +111,15 @@ function setMinesNegsCount() {
     }
 }
 
+// Count the mines around the given cell at (row, col)
 function countMinesAround(row, col) {
     var count = 0
     for (var i = row - 1; i <= row + 1; i++) {
-        if (i < 0 || i > gLevel.SIZE - 1) continue
+        if (i < 0 || i > gLevel.SIZE - 1) continue // only check valid rows
 
         for (var j = col - 1; j <= col + 1; j++) {
-            if (j < 0 || j > gLevel.SIZE - 1) continue
-            if (i === row && j === col) continue
+            if (j < 0 || j > gLevel.SIZE - 1) continue // only check valid columns
+            if (i === row && j === col) continue // ignore the cell itself
 
             var cell = gBoard[i][j]
             if (cell.isMine) {
@@ -112,8 +132,8 @@ function countMinesAround(row, col) {
 }
 
 function renderBoard() {
+    // create the table to insert in the html inside .main-board
     var htmlStr = '<table>'
-
     for (var i = 0; i < gLevel.SIZE; i++) {
         htmlStr += '<tr>'
         for (var j = 0; j < gLevel.SIZE; j++) {
