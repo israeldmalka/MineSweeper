@@ -294,6 +294,19 @@ function getRandomNumber(min, max) {
 }
 
 function onCellMarked(elCell, row, col) {
+
+    if (gGame.isGameOver) {
+        console.log('Game is already over')
+        return
+    }
+
+    if (!gGame.isStarted) {
+        console.log('Starting the game') // first click on a cell
+
+        gGame.isStarted = true
+        gSecondsInterval = setInterval(incrementSeconds, 1000)
+    }
+
     var cell = gBoard[row][col]
 
     if (cell.isRevealed) {
